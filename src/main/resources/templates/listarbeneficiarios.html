@@ -1,0 +1,158 @@
+<html lang="PT-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthPlan</title>
+<link rel="icon" th:href="@{/img/healthicon.png}">
+
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap"
+	rel="stylesheet">
+
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+	integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+	crossorigin="anonymous">
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+	integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+	crossorigin="anonymous"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+	integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+	crossorigin="anonymous"></script>
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+	integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+	crossorigin="anonymous"></script>
+
+<script src="https://kit.fontawesome.com/14ec366e22.js"
+	crossorigin="anonymous"></script>
+</head>
+<body>
+
+	
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" style="font-size: 30px;"><img
+			th:src="@{/img/healthicon.png}"
+			style="width: 60px; height: 60px; margin-right: 10px;">HealthPlan</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarNav" aria-controls="navbarNav"
+			aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item"><a class="nav-link" href="#">Cadastrar
+						<span class="sr-only">(current)</span>
+				</a>
+					<ul class="submenu">
+						<li><a th:href="@{/create}">Novo beneficiário</a></li>
+
+					</ul></li>
+				<li class="nav-item"><a class="nav-link" href="#">Atualizar</a>
+					<ul class="submenu">
+						<li><a th:href="@{/update}">Beneficiário
+								existente</a></li>
+					</ul></li>
+				<li class="nav-item"><a class="nav-link" href="#">Relatório</a>
+					<ul class="submenu">
+						<li><a th:href="@{/listarbeneficiarios}">Beneficiários</a></li>
+						<li><a th:href="@{/listardocumentos}">Documentos</a></li>
+					</ul></li>
+
+				<ul class="navbar-nav" style="margin-left: 260%;">
+					<li class="nav-item"><a class="nav-link" th:href="@{/sair}">Sair</a>
+					</li>
+				</ul>
+			</ul>
+		</div>
+	</nav>
+
+
+<div class="container-lg mt-3">
+    <h1>Lista de beneficiários cadastrados</h1>
+    <div class="card">
+        <div class="card-body">         
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <th>Data de Nascimento</th>                      
+                        <th>Data de criação:</th>
+                        <th>Data de atualização:</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaBeneficiarios">
+                  
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+        
+        $.ajax({
+            type: 'GET',
+            url: '/api/beneficiarios/listbeneficiarios',
+            success: function (beneficiarios) {
+                
+                $('#tabelaBeneficiarios').empty();
+
+               
+                beneficiarios.forEach(function (beneficiario) {
+                    var row = '<tr>' +
+                        '<td>' + beneficiario.id + '</td>' +
+                        '<td>' + beneficiario.nome + '</td>' +
+                        '<td>' + beneficiario.telefone + '</td>' +
+                        '<td>' + formatDate(beneficiario.dataNascimento) + '</td>' +
+                        '<td>' + formatDate(beneficiario.dataInclusao) + '</td>' +
+                        '<td>' + formatDate(beneficiario.dataAtualizacao) + '</td>' +
+                        '</tr>';
+                    $('#tabelaBeneficiarios').append(row);
+                });
+            },
+            error: function (error) {
+                console.error('Erro ao obter beneficiários:', error);
+            }
+        });
+
+        
+        function formatDate(dateString) {
+            var options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            var formattedDate = new Date(dateString).toLocaleDateString('pt-BR', options);
+            return formattedDate;
+        }
+    });
+</script>
+
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $('.submenu').hide();
+    });
+
+    $(document).ready(function () {
+        $('.nav-item').hover(function () {
+            $(this).find('.submenu').stop(true, true).slideDown(200);
+        }, function () {
+            $(this).find('.submenu').stop(true, true).slideUp(200);
+        });
+    });
+</script>
+</body>
+</html>
